@@ -11,6 +11,7 @@ import RecurringPaymentsModal from './components/RecurringPaymentsModal';
 import TrendChart from './components/TrendChart';
 import InvestmentView from './components/InvestmentView';
 import GithubSyncView from './components/GithubSyncView';
+import PinAuth from './components/PinAuth';
 import { 
   Plus, 
   Wallet, 
@@ -29,7 +30,8 @@ import {
   Menu,
   X,
   Briefcase,
-  Cloud
+  Cloud,
+  Lock
 } from 'lucide-react';
 import { 
   PieChart, 
@@ -78,6 +80,8 @@ export default function App() {
   const [githubToken, setGithubToken] = useState<string | null>(localStorage.getItem('github_token'));
   const [githubUser, setGithubUser] = useState<any>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [hasPin, setHasPin] = useState(!!localStorage.getItem('app_pin'));
 
   const insightsRef = React.useRef<HTMLDivElement>(null);
   const chartsRef = React.useRef<HTMLDivElement>(null);
@@ -197,6 +201,12 @@ export default function App() {
 
   return (
     <div className="flex h-screen bg-[#0f172a] text-white font-sans overflow-hidden">
+      <AnimatePresence>
+        {!isAuthenticated && (
+          <PinAuth onAuthenticated={() => setIsAuthenticated(true)} />
+        )}
+      </AnimatePresence>
+
       {/* Sidebar Overlay for Mobile */}
       <AnimatePresence>
         {isSidebarOpen && (
@@ -294,6 +304,18 @@ export default function App() {
           >
             <Settings className="w-4 h-4" />
             Настройки
+          </button>
+          <button 
+            onClick={() => { 
+              if (confirm('Вы уверены, что хотите сбросить ПИН-код?')) {
+                localStorage.removeItem('app_pin');
+                window.location.reload();
+              }
+            }}
+            className="w-full flex items-center gap-3 px-4 py-3 text-white/40 hover:bg-white/5 hover:text-rose-400 rounded-xl text-sm font-medium transition-colors"
+          >
+            <Lock className="w-4 h-4" />
+            Сбросить ПИН
           </button>
         </nav>
 
